@@ -1,0 +1,305 @@
+<html>
+    
+    <head>
+        <meta charset='utf-8' />
+        <title>London EV Charge Points</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+
+        
+        <style>
+        
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+            }
+
+            #map {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              width: 100%;
+            }
+
+            h1 {
+              font-size: 20px;
+              line-height: 30px;
+            }
+
+            h2 {
+              font-size: 15px;
+              line-height: 10px;
+              margin-bottom: 10px;
+            }
+
+            a {
+              text-decoration: none;
+              color: #2dc4b2;
+            }
+
+            #console {
+              position: absolute;
+              width: 270px;
+              margin: 10px;
+              padding: 10px 20px;
+              background-color: white;
+            }
+            
+            .session {
+            margin-bottom: 1px;
+            }
+
+            .row {
+              height: 70px;
+              width: 100%;
+            }
+
+            .colors {
+              background: linear-gradient(to right, #218b7f, #3bb3c3, #5085a8, #8b88b6, #a2719b, #aa5e79);
+              margin-bottom: 5px;
+            }
+
+            .label {
+              width: 15%;
+              display: inline-block;
+              text-align: center;
+            }
+            .map-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            margin-right: 20px;
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            border-radius: 3px;
+        }
+
+        #legend {
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 18px;
+            height: 160px;
+            margin-bottom: 40px;
+            width: 60px;
+        }
+
+        .legend-key {
+            display: inline-block;
+            border-radius: 20%;
+            width: 9px;
+            height: 9px;
+            margin-right: 5px;
+        }
+        
+        </style>   
+  </head>
+    
+    
+  <body>
+    
+        <div id='map'></div>
+        <div id='console'>
+        <h1>London Public Charge Point</h1>
+        <p>Data: <a href='https://www.gov.uk/guidance/find-and-use-data-on-public-electric-vehicle-chargepoints'>Public electric vehicle chargepoints</a> in UK, August 2020</p>
+      
+        <div class='session'>
+          
+          <h2>Year Option</h2>
+          <div class='row' id='filters'>
+            <input id='all' type='checkbox' name='toggle' value='all' checked='unchecked'>
+            <label for='all'>All Years</label>
+            <!-- <input id='singleYear' type='radio' name='toggle' value='singleYear'>
+            <label for='singleYear'>Single Year</label> -->
+          </div>
+        </div>
+      
+        
+        <div class='session' id='sliderbar'>
+          <h2>Year Selection: <label id='dateCreated'>2012</label></h2>
+          <input id='slider' class='row' type='range' min='2012' max='2020' step='1' value='2012' />
+        </div>
+
+        <div class='session'>
+          <div class='row' id='filtersTwo'>
+              <fieldset>
+              <label><h2>Location Type</h2></label>
+              <select id='layer' name='layer'>
+                  <option value='all'>All types</option>
+                  <option value='On-street'>On-street</option>
+                  <option value='Public car park'>Public car park</option>
+                  <option value='Retail car park'>Retail car park</option>
+                  <option value='Leisure centre'>Leisure centre</option>
+                  <option value='NHS property'>NHS property</option>
+                  <option value='Dealership forecourt'>Dealership forecourt</option>
+                  <option value='Park & Ride site'>Park & Ride site</option>
+                  <option value='Educational establishment'>Educational establishment</option>
+                  <option value='other'>Other</option>
+              </select>
+              </fieldset>
+          </div>
+      </div>
+    </div>
+    <div class='map-overlay' id='legend'></div>
+
+
+        <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamFtaWU5NiIsImEiOiJja2tmY2drdWwwZ3RzMnZuN3NhcHZsaTNmIn0.D_LiH1erSaNKmjbq0CSVKg';
+        
+        var map = new mapboxgl.Map({
+           container: 'map', // container element id
+          //style: 'mapbox://styles/jamie96/ckohesjdu6v7r17nowwne9eun',
+          style: 'mapbox://styles/mapbox/dark-v10',
+          center: [-0.1789619958494768, 51.488], // initial map center in [lon, lat]
+          zoom: 9.6
+        });
+        
+        map.on('load', function() {
+          var filterYears = ['!=',['number',['get','dateCreated']],0];
+          var filterLocationType = ['match',['get','locationType'],['other'],false,true];
+
+          var layers = ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'];
+          var colors = ['#005f73', '#0a9396', '#94d2bd','#e9d8a6', '#ee9b00','#ca6702','#bb3e03','#ae2012','#9b2226'];
+          
+          for (i = 0; i < layers.length; i++) {
+                var layer = layers[i];
+                var color = colors[i];
+                var item = document.createElement('div');
+                var key = document.createElement('span');
+                key.className = 'legend-key';
+                key.style.backgroundColor = color;
+
+                var value = document.createElement('span');
+                value.innerHTML = layer;
+                item.appendChild(key);
+                item.appendChild(value);
+                legend.appendChild(item);
+            }
+          map.addLayer({
+            id: 'chargep',
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: 'https://raw.githubusercontent.com/HipHopZeus/gis_code/main/charge_pointGEO(1).geojson' // replace this with the url of your own geojson
+            },
+            paint: {
+              'circle-radius': {
+                            'base': 1.5,
+                            'stops': [
+                              [12, 5],
+                              [22, 180]
+                            ]
+                          },
+              'circle-color': [
+                'match',
+                 ['get', 'dateCreated'],
+                2012, '#005f73',
+                2013, '#0a9396',
+                2014, '#94d2bd',
+                2015, '#e9d8a6',
+                2016, '#ee9b00',
+                2017, '#ca6702',
+                2018, '#bb3e03',
+                2019, '#ae2012',
+                2020, '#9b2226',
+                /* other */ '#ccc'
+              ],
+              'circle-opacity': 0.7
+            },
+            filter: ['all',filterYears,filterLocationType]
+           
+            
+          });
+
+
+        document.getElementById('slider').addEventListener('input', function(e) {
+          var year = parseInt(e.target.value);
+          // update the map
+          //map.setFilter('chargep', ['==', ['number', ['get', 'dateCreated']], year]);
+          filterYears = ['==',['number',['get','dateCreated']],year];
+          
+          map.setFilter('chargep',['all',filterYears,filterLocationType]);
+
+           document.getElementById('dateCreated').innerText = year;
+        });
+
+        document.getElementById('filters').addEventListener('change', function(e) {
+          var year = e.target.value;
+          // update the map filter
+          if (year === 'all') {
+            filterYears = window.location.reload();
+            //filterYears =['!=',['number',['get','dateCreated']],0];
+          // } else if (year === 'singleYear') {
+          //   filterYears = ['==', ['match', ['get', 'dateCreated']], 2012];
+          } else {
+            console.log('error');
+          }
+          // map.setFilter('chargep', ['all',filterYears,filterLocationType]);
+        });
+
+        // var year = ['==', ['number', ['get', 'dateCreated']], 2012];
+        // var filterYears = ['all', ['match', ['get', 'dateCreated']], 'dateCreated'];
+        // year = ['==', ['number', ['get', 'dateCreated']], 2012];
+
+        document.getElementById('filtersTwo').addEventListener('change', function(e){
+        
+        var LocationType = e.target.value;
+        if (LocationType === 'all') {
+            filterLocationType = ['!=', ['string', ['get', 'locationType']], 'placeholder'];
+        } else if (LocationType === 'On-street') {
+          filterLocationType = ['match',['get','locationType'],['On-street'],true,false];
+        } else if (LocationType === 'Public car park') {
+           filterLocationType = ['match',['get','locationType'],['Public car park'],true,false];
+         } else if (LocationType === 'Retail car park') {
+          filterLocationType = ['match',['get','locationType'],['Retail car park'],true,false];
+        } else if (LocationType === 'Leisure centre') {
+          filterLocationType = ['match',['get','locationType'],['Leisure centre'],true,false];
+        } else if (LocationType === 'NHS property') {
+          filterLocationType = ['match',['get','locationType'],['NHS property'],true,false];
+        } else if (LocationType === 'Dealership forecourt') {
+          filterLocationType = ['match',['get','locationType'],['Dealership forecourt'],true,false];
+        } else if (LocationType === 'Park & Ride site') {
+          filterLocationType = ['match',['get','locationType'],['Park & Ride site'],true,false];
+        } else if (LocationType === 'Educational establishment') {
+          filterLocationType = ['match',['get','locationType'],['Educational establishment'],true,false];
+        } else if (LocationType === 'other') {
+          filterLocationType = ['match',['get','locationType'],['other'],true,false];
+         };
+        
+        map.setFilter('chargep',['all',filterYears, filterLocationType]);
+
+        });
+        
+        var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+      map.on('click', function (e) {
+        var features = map.queryRenderedFeatures(e.point);
+        let feature = features.find(f => 'chargep' === f.layer.id  )
+        if (!feature) return;
+        const { chargeDeviceID, name, town,postcode, deviceOwnerName, locationType} = feature.properties;
+        popup.remove()
+        popup.setLngLat(e.lngLat).setHTML(
+          `<div>
+              <b>chargeDeviceID:</b>&nbsp;${chargeDeviceID}</br>
+              <b>name:</b>&nbsp;${name}</br>
+              <b>town:</b>&nbsp;${town}</br>
+              <b>postcode:</b>&nbsp;${postcode}</br>
+              <b>deviceOwnerName:</b>&nbsp;${deviceOwnerName}</br>
+              <b>locationType:</b>&nbsp;${locationType}</br>
+              
+          </div>`
+        ).addTo(map);
+      });
+      });
+        
+        // filter: ['==', ['number', ['get', 'dateCreated']], 2013]
+             
+        </script>
+        
+  </body>
+    
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Vehicles' CO2 emissions in London</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css" rel="stylesheet" />
+
+    <script charset="utf-8" src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/dimple/2.3.0/dimple.latest.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .map-overlay {
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            position: absolute;
+            width: 25%;
+            top: 0;
+            left: 0;
+            padding: 10px;
+        }
+
+        .map-overlay .map-overlay-inner {
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .map-overlay table {
+            border: none;
+            width: 100%;
+        }
+
+        .map-overlay h2 {
+            line-height: 24px;
+            display: block;
+            margin: 0 0 10px;
+        }
+
+        .map-overlay label {
+            font: 16px/18px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            vertical-align: bottom;
+            margin: 0;
+            padding: 0;
+        }
+
+        .map-overlay input {
+            display: inline;
+            vertical-align: middle;
+            margin: 5px;
+            padding: 0;
+        }
+
+        .map-overlay p.credit {
+            margin: 5px 0 0 0;
+            padding: 0;
+        }
+
+        .legend .bar {
+            margin-top: 10px;
+            height: 10px;
+            width: 100%;
+            background: linear-gradient(to right, rgb(9, 195, 228), rgb(231, 155, 41), rgb(241, 39, 39))
+        }
+
+        #barChart {
+            width: 100%;
+            height: 500px;
+            position: absolute;
+            top: 100%;
+        }
+
+        #handleBarChart {
+            position: relative;
+            width: 200px;
+            float: right;
+            top: 100px;
+            right: 410px;
+        }
+
+        #lineChart {
+            width: 100%;
+            height: 500px;
+            position: absolute;
+            top: 180%;
+            padding-left: 30px;
+        }
+        .le-bar{
+            width: 65px;
+            display:inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+
+    <div class='map-overlay top'>
+        <div class='map-overlay-inner'>
+            <h2>Vehicles' CO2 emissions in London</h2>
+            <table id="infoTable">
+                <tr>
+                    <td>
+                        <input id='slider' type='range' min='0' max='5' step='1' value='0' list='tickmarks' />
+                        <datalist id="tickmarks">
+                            <option value="0">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                            <option value="4">
+                            <option value="5"> 
+                        </datalist>
+                    </td>
+                    <td>
+                        <label id='year'>2008</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Type:</label><br />
+                        <input type="radio" name="type" value="Rds_Car" checked>Rds_Car (LTS and Other Major)<br />
+                        <input type="radio" name="type" value="Rds_Motorcycle">Rds_Motorcycle (LTS and Other Major)<br />
+                        <input type="radio" name="type" value="Rds_Taxi">Rds_Taxi (LTS and Other Major)<br />
+                        <p>London Atmospheric Emissions Inventory, <a href="aaa/London Atmospheric Emissions Inventory (LAEI) 2013 - London Datastore.html"> London Datastore</London></a>, 2008-2030
+                    </td> 
+                </tr>
+            </table>
+            <div class="legend">
+                <div class="bar"></div>
+                <div><span class="le-bar">0</span><span class="le-bar">100</span><span class="le-bar">200</span><span class="le-bar">300</span><span class="le-bar">400</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGFzc2Z1c2lvbiIsImEiOiJja29sdWJtcXowaXdoMnZwZTdwanhzNjZ5In0.BcsYP-5metQLt8HHI3GdkQ';  //Put your mapbox access token here
+
+        let map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v9',
+            center: [-0.12599363, 51.49479144],
+            zoom: 11,
+            pitch: 0
+        });
+
+        let dates = ['2008','2010','2013','2020','2025','2030'];
+
+        let year = dates[0], source=dates[0], field = 'Rds_Car';
+
+        map.on('load', function () {
+            map.addControl(new mapboxgl.NavigationControl());
+            map.addSource('2008', {
+                type: 'vector',
+                url: 'mapbox://passfusion.4xiuu2a9'
+            });
+            map.addSource('2010', {
+                type: 'vector',
+                url: 'mapbox://passfusion.ctaqh5ll'
+            });
+            map.addSource('2013', {
+                type: 'vector',
+                url: 'mapbox://passfusion.5dy16gwa'
+            });
+            map.addSource('2020', {
+                type: 'vector',
+                url: 'mapbox://passfusion.bp5hvp2g'
+            });
+            map.addSource('2025', {
+                type: 'vector',
+                url: 'mapbox://passfusion.5a5rzw61'
+            });
+            map.addSource('2030', {
+                type: 'vector',
+                url: 'mapbox://passfusion.3t3o3wi8'
+            });
+
+            let my_layers = ['Emissions2008-51fe8s', 'Emissions2010-03wzch', 'Emissions2013-81bkw8', 'Emissions2020-a7muq6', 'Emissions2025-1hgra8', 'Emissions2030-a5jeak']
+            let layer = my_layers[0];
+            addToLayer()
+
+            let types = document.getElementsByName('type')
+            for (let i = 0; i < types.length; i++) {
+                types[i].addEventListener("click", (e) => {
+                    field = e.target.value
+                    setLayer()
+                });
+            }
+
+            document.getElementById('slider').addEventListener('input', (e) => {
+                let val = parseInt(e.target.value);
+                year = dates[val]
+                source = dates[val]
+                layer = my_layers[val]
+                document.getElementById('year').textContent =  'Year '+year;
+                setLayer()
+            });
+
+            function setLayer() {
+                map.removeLayer('LTS')
+                map.removeLayer('Major')
+                addToLayer()
+            }
+
+            function addToLayer() {
+                map.addLayer({
+                    id: 'LTS',
+                    source: source,
+                    'source-layer': layer,
+                    'type': 'line',
+                    // 'filter': ['==', 'isState', true],
+                    'paint': {
+                        'line-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get',  year +' Emissions LTS '+ field],
+                            // 0, '#005F73', 50, '#0A9396', 100, '#94D2BD', 150, '#E9D8A6', 200, '#EE9B00', 250, '#CA6702', 300, '#BB3E03', 350, '#AE2012', 400, 'Red'
+                        ],
+                        'line-width':3,
+                        // 'line-opacity': [
+                        //     'case',
+                        //     ['boolean', ['feature-state', 'hover'], false],
+                        //     1,
+                        //     0.75
+                        // ]
+                    }
+                });
+
+                map.addLayer({
+                    id: 'Major',
+                    source: source,
+                    'source-layer': layer,
+                    'type': 'line',
+                    // 'filter': ['==', 'isState', true],
+                    'paint': {
+                        'line-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['get', year +' Emissions Other Major '+ field],
+                            // 0, '#005F73', 50, '#0A9396', 100, '#94D2BD', 150, '#E9D8A6', 200, '#EE9B00', 250, '#CA6702', 300, '#BB3E03', 350, '#AE2012', 400, 'Red'
+                            0, '#005F73', 50, '#0A9396', 100, '#94D2BD', 150, '#E9D8A6', 200, '#EE9B00', 250, '#CA6702', 300, '#BB3E03', 350, '#AE2012', 400, 'Red'
+                        ],
+                        // 'line-opacity': [
+                        //     'case',
+                        //     ['boolean', ['feature-state', 'hover'], false],
+                        //     1,
+                        //     0.75
+                        // ]
+                    }
+                });
+
+            }
+
+            var popup = new mapboxgl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
+            map.on('click', function (e) {
+                var features = map.queryRenderedFeatures(e.point);
+                console.log(features)
+
+                let d = features.filter(d => d.layer.id == 'Major')[0] //=== layer.id
+                if (d) {
+                    let val1 = d.properties[ year +' Emissions Other Major Rds_Car']
+                    let val2 = d.properties[year + ' Emissions Other Major Rds_Motorcycle']
+                    let val3 = d.properties[year + ' Emissions Other Major Rds_Taxi']
+                    val1 = parseFloat(val1).toFixed(2)
+                    val2 = parseFloat(val2).toFixed(2)
+                    val3 = parseFloat(val3).toFixed(2)
+
+                    popup.remove()
+                    popup.setLngLat(e.lngLat).setHTML(`
+                        <div>
+                            <b>${year} Emissions Other Major Rds_Car:</b>${val1}</br>
+                            <b>${year} Emissions Other Major Rds_Motorcycle:</b>${val2}</br>
+                            <b>${year} Emissions Other Major Rds_Taxi:</b>${val3}</br>
+                        </div>`
+                    ).addTo(map);
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

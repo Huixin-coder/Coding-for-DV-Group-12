@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Difference of Public Transport Accessibility Index</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 20px;
+            line-height: 30px;
+        }
+
+        h2 {
+            font-size: 14px;
+            line-height: 20px;
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #2dc4b2;
+        }
+
+        p {
+            font-size: 12.5px
+        }
+
+        #console {
+            position: absolute;
+            width: 240px;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: white;
+            opacity: 0.7;
+        }
+
+
+        .label {
+            width: 9%;
+            display: inline-block;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .map-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            margin-right: 20px;
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            border-radius: 3px;
+        }
+
+        #legend {
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 18px;
+            height: 140px;
+            margin-bottom: 40px;
+            width: 200px;
+        }
+
+        .legend-key {
+            display: inline-block;
+            border-radius: 20%;
+            width: 10px;
+            height: 10px;
+            margin-right: 5px;
+        }
+
+    </style>
+
+
+    <div id='map'></div>
+    <div id='console'>
+        <h1>Distribution of Different Types of Cycle Lanes</h1>
+        <p><b>Data: </b>Cycle lanes and tracks from
+            <a href='https://cycling.data.tfl.gov.uk/'>London’s Cycling Infrastructure Database (CID) </a>
+            <br />
+        <p>Cycle lanes are classified into 6 main categories base on <a href='https://consultations.tfl.gov.uk/cycling/draft-london-cycling-design-standards/user_uploads/ch3-cycle-lanes-and-tracks.pdf'>TfL consultations</a>. From ADVISORY to SEGREGATED (in the legend), the higher up the road the more suitable and safer it is for cycling.</p>
+        <p><b>SEGREGATED:</b>Lane segregated by a continuous or near-continuous physical upstand (kerbs and/or segregating islands) along links.</p>
+        <p><b>STEPPED:</b>Vertically separated cycle tracks at an intermediate level between the footway and main carriageway.</p>
+        <p><b>PARTIALLY SEGREGATED:</b>A facility separated and protected by intermittently placed objects. These generally includes formal, mandatory lane markings.</p>
+        <p><b>MANDATORY:</b>A marked lane for exclusive use of cyclists (with some exceptions) during the advertised hours of operation. It is an offence for other vehicles to enter, unless they are exempted.</p>
+        <p><b>SHARED:</b>Cyclists may use the full width of the bus lane during and beyond its hours of operation. Applies to nearside, with-flow bus lanes, and should extend to contraflow and offside types.</p>
+        <p><b>ADVISORY:</b>An area intended for, but not legally restricted to, cyclists’ use. Other vehicles are permitted to enter or cross it.</p>
+
+
+    </div>
+    <div class='map-overlay' id='legend'></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5uZWd1dSIsImEiOiJja2hxOXl1Y2owNzJhMnJwYmk2YmMxYnZoIn0.Q8eejSLO2kx3Vrc6oyAmVA';
+
+        var map = new mapboxgl.Map({
+            container: 'map', // container element id
+            style: 'mapbox://styles/anneguu/ckogfj3uk2ok818kx9m8pf4ji',
+            center: [-0.1, 51.5], // initial map center in [lon, lat]
+            zoom: 9.5
+        });
+
+        map.on('load', function() {
+            var layers = ['SEGREGATED', 'STEEPED', 'PARTIALLY SEGREGATED', 'MANDATORY', 'SHARED', 'ADVISORY'];
+            var colors = ['#277da1', '#4d908e', '#90be6d', '#f9c74f', '#f8961e', '#f94144'];
+            for (i = 0; i < layers.length; i++) {
+                var layer = layers[i];
+                var color = colors[i];
+                var item = document.createElement('div');
+                var key = document.createElement('span');
+                key.className = 'legend-key';
+                key.style.backgroundColor = color;
+
+                var value = document.createElement('span');
+                value.innerHTML = layer;
+                item.appendChild(key);
+                item.appendChild(value);
+                legend.appendChild(item);
+            };
+
+
+
+            map.on('click', 'cycle-lanes-994c0v (1)', function(e) {
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(`<div>
+            <b>BOROUGH:</b>&nbsp;${e.features[0].properties['BOROUGH']}</br>
+            <b>LENGTH:</b>&nbsp;${e.features[0].properties['Length']}</br>
+            <b>SEGREGATED:</b>&nbsp;${e.features[0].properties['CLT_SEGREG']}</br>
+            <b>STEEPED:</b>&nbsp;${e.features[0].properties['CLT_STEPP']}</br>
+            <b>PARTIALLY SEGREGATED:</b>&nbsp;${e.features[0].properties['CLT_PARSEG']}</br>
+            <b>MANDATORY:</b>&nbsp;${e.features[0].properties['CLT_MANDAT']}</br>
+            <b>SHARED:</b>&nbsp;${e.features[0].properties['CLT_SHARED']}</br>
+            <b>ADVISORY:</b>&nbsp;${e.features[0].properties['CLT_ADVIS']}</br>
+            </div>`
+                        //e.features[0].properties['LSOA11CD'] + ': ' + e.features[0].properties['Difference']
+                    )
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the states layer.
+            map.on('mouseenter', 'cycle-lanes-994c0v (1)', function() {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves.
+            map.on('mouseleave', 'cycle-lanes-994c0v (1)', function() {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+
+    </script>
+
+
+</body>
+
+</html>

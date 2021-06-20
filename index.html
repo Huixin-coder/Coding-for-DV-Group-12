@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+     <meta name="viewport"content="width=device-width,initial-scale=1,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
+
+    <link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+    <meta name="apple-mobile-web-app-title" content="CodePen">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+    <link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+    <script type="text/javascript" src="vendors/scrolloverflow.min.js"></script>
+    <script type="text/javascript" src="fullpage.js"></script>
+
+    <title>Group 12 - Transition of Travel Mode in London </title>
+
+
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.6.6/jquery.fullPage.css'>
+
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Alegreya+Sans:300,400,700);
+
+
+
+        /* ICON STYLES - ICON FROM: http://fontastic.me/
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        @font-face {
+            font-family: "untitled-font-1";
+            src: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/untitled-font-1.eot");
+            src: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/untitled-font-1.eot#iefix") format("embedded-opentype"),
+                url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/untitled-font-1.woff") format("woff"),
+                url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/untitled-font-1.ttf") format("truetype"),
+                url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/untitled-font-1.svg#untitled-font-1") format("svg");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        [class^="icon-"]:after,
+        [class*=" icon-"]:after {
+            font-family: "untitled-font-1";
+            font-style: normal;
+            font-weight: normal;
+            font-variant: normal;
+            text-transform: none;
+            speak: none;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .icon-up-open-big {
+            display: inline-block;
+        }
+
+        .icon-up-open-big:after {
+            content: "a";
+            font-size: 2.5em;
+            display: block;
+            transform: rotateX(180deg);
+            color: black;
+            transition: color .3s;
+        }
+
+        .icon-up-open-big:hover:after {
+            color: white;
+        }
+
+        .scroll-icon {
+            position: absolute;
+            left: 50%;
+            bottom: 30px;
+            padding: 0 10px;
+            transform: translateX(-50%);
+        }
+
+
+
+        /* HELPER CLASSES
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        .clearfix:before,
+        .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .l-left {
+            float: left;
+        }
+
+        .l-right {
+            float: right;
+        }
+
+        .end {
+            margin-top: 30px;
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(300px);
+            transition: opacity, transform 1s;
+            transition-delay: 1s;
+        }
+
+
+
+        /* RESET-GENERAL STYLES
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Alegreya Sans', Arial, sans-serif;
+            text-transform: uppercase;
+        }
+
+        html {
+            font-size: 62.5%;
+        }
+
+        body {
+            color: black;
+            letter-spacing: .18em;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        ul,
+        li {
+            list-style-type: none;
+        }
+
+
+
+        /* NAV STYLES
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        .header-top {
+            background: rgba(0, 47, 77, .3);
+            height: 70px;
+            padding: 0 10px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 12;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            line-height: 70px;
+            height: 70px;
+        }
+
+        h1 a {
+            display: block;
+            padding: 0 10px;
+        }
+
+        .toggle-menu {
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            position: relative;
+            top: 10px;
+        }
+
+        .toggle-menu i {
+            position: absolute;
+            display: block;
+            height: 2px;
+            background: white;
+            width: 30px;
+            left: 10px;
+            transition: all .3s;
+        }
+
+        .toggle-menu i:nth-child(1) {
+            top: 16px;
+        }
+
+        .toggle-menu i:nth-child(2) {
+            top: 24px;
+        }
+
+        .toggle-menu i:nth-child(3) {
+            top: 32px;
+        }
+
+        .open-menu i:nth-child(1) {
+            top: 25px;
+            transform: rotateZ(45deg);
+        }
+
+        .open-menu i:nth-child(2) {
+            background: transparent;
+        }
+
+        .open-menu i:nth-child(3) {
+            top: 25px;
+            transform: rotateZ(-45deg);
+        }
+
+        nav {
+            height: 0;
+            opacity: 0;
+            box-sizing: border-box;
+            background: rgba(0, 47, 77, .25);
+            position: fixed;
+            top: 70px;
+            width: 100%;
+            transition: all 3s;
+        }
+
+        .open-menu~nav {
+            opacity: 1;
+            padding: 80px 0;
+            z-index: 15;
+            height: calc(90vh - 70px);
+        }
+
+        nav ul {
+            padding: 0 10px;
+            display: flex;
+        }
+
+        nav li {
+            flex: 1;
+        }
+
+        nav li a {
+            font-size: 2em;
+            display: block;
+            padding: 30px;
+            text-align: center;
+            transition: background .3s;
+        }
+
+        nav li:nth-child(odd) a,
+
+        body.fp-viewing-page15-1 #menu li:nth-child(6) a {
+            background: rgba(255,255,255,0.2);
+        }
+
+        nav li:nth-child(even) a {
+            background: rgba(128,128,128,0.3);
+        }
+
+        nav li:nth-child(odd) a:hover {
+            background: rgba(128,128,128,0.6);
+        }
+
+        nav li:nth-child(even) a:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /*
+        nav li.active a,
+        body.fp-viewing-sixthSection-1 #menu li:last-child a {
+            background: #453659;
+        }
+*/
+
+
+
+        /* SECTION STYLES - fullPage.js 
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        section {
+            text-align: center;
+            /*background: url('https://unsplash.it/1910/1221?image=626') no-repeat center / cover;*/
+           
+        }
+
+        h2 {
+            font-size: 4.5em;
+
+            margin-bottom: 20px;
+            color: azure;
+        }
+
+        h3 {
+            font-family: Papyrus, fantasy;
+            font-weight: 300;
+            font-size: 1.8em;
+            margin-left: 12%;
+            margin-right: 12%;
+            margin-top: 3%;
+        }
+
+        h4 {
+            font-size: 4em;
+            font-family: Papyrus, fantasy;
+            margin-bottom: 20px;
+        }
+
+        h5 {
+            font-family: Papyrus, fantasy;
+            font-weight: 300;
+            font-size: 1.4em;
+            margin-left: 12%;
+            margin-right: 12%;
+            margin-top: 3%;
+        }
+
+        h6 {
+            font-family: Papyrus, fantasy;
+            font-weight: 300;
+            font-size: 0.8em;
+            margin-left: 12%;
+            margin-right: 12%;
+            margin-top: 3%;
+        }
+
+        h7 {
+            font-size: 2em;
+            font-family: Papyrus, fantasy;
+            margin-bottom: 20px;
+        }
+
+        h8 {
+            font-family: Papyrus, fantasy;
+            font-weight: bold;
+            font-size: 0.3em;
+
+        }
+        
+        p{
+            font-size: 15px;
+            font-family:'Helvetica Neue', Helvetica, Arial, Sans-serif;
+        }
+
+
+
+        /* SLIDENAV STYLES - fullPage.js 
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        #fp-nav ul li a span,
+        .fp-slidesNav ul li a span {
+            background: black;
+            width: 9px;
+            height: 9px;
+            margin: -4px 0 0 -4px;
+        }
+
+        #fp-nav ul li a.active span,
+        .fp-slidesNav ul li a.active span,
+        #fp-nav ul li:hover a.active span,
+        .fp-slidesNav ul li:hover a.active span {
+            width: 18px;
+            height: 18px;
+            margin: -8px 0 0 -8px;
+            background: transparent;
+            box-sizing: border-box;
+            border: 1px solid #24221F;
+        }
+
+
+
+        /* MQ STYLES
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+        @media screen and (max-width: 767px) {
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav li {
+                margin-top: 1px;
+            }
+
+            nav li a {
+                font-size: 1.5em;
+            }
+
+            .scroll-icon {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            html {
+                font-size: 50%;
+            }
+
+            .open-menu~nav {
+                padding: 20px 0;
+            }
+
+            nav li a {
+                padding: 3px;
+            }
+        }
+
+        /*
+        .homepage{  
+            position: relative; 
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;}
+        
+        .homepage:before{ 
+              z-index:1;
+              content: "";
+              background-image: url('./londonHome.jpg');
+              background-size: cover;
+              position: absolute;
+            
+              opacity: 0.5;}
+*/
+
+    </style>
+
+
+
+
+
+
+</head>
+
+<body translate="no">
+    <header>
+        <div class="header-top clearfix">
+            <h1 class="l-left"><a href="#page1">Transition of Travel Mode in London</a></h1>
+            <a class="l-right toggle-menu" href="#">
+                <i></i>
+                <i></i>
+                <i></i>
+            </a>
+        </div>
+
+        <nav class="hide">
+            <ul id="menu">
+                <li data-menuanchor="page1">
+                    <a href="#page1" title="page1">Home</a>
+                </li>
+
+                <li data-menuanchor="page2">
+                    <a href="#page2" title="page2">Intro</a>
+                </li>
+
+
+                <!--                huixin-->
+                <li data-menuanchor="page3">
+                    <a href="#page3" title="page3">Overview</a>
+                </li>
+
+
+                <!--       zheqian         -->
+                <li data-menuanchor="page8">
+                    <a href="#page8" title="page8">Energy Consumption</a>
+                </li>
+
+
+
+
+                <li data-menuanchor="page12">
+                    <a href="#page12" title="page12">Private Transportation</a>
+                </li>
+
+
+                <li data-menuanchor="page15">
+                    <a href="#page15" title="page15">Public Transportation</a>
+                </li>
+
+                <li data-menuanchor="page20">
+                    <a href="#page20" title="page20">About Us</a>
+                </li>
+
+                <!--
+                <li data-menuanchor="seventhSection">
+                    <a href="#seventhSection" title="seventhSection">Others</a>
+                </li>
+-->
+
+            </ul>
+        </nav>
+    </header>
+
+    <div id="fullpage">
+        <!--        page1-->
+        <section id="homePage" class="vertical-scrolling" data-anchor="page1" style="background-image:url(./LondonHome.jpg); background-color: rgba(255,255,255, 0.1); background-size: cover">
+           <h2 style="font-family:Papyrus, fantasy; font-size:75px">Transition of Travel Mode </h2>
+            <h2 style="font-family:Papyrus, fantasy; font-size:75px">in London</h2>
+            <div class="scroll-icon">
+                <p style="font-family:Papyrus, fantasy; font-size:30px">Start</p>
+                <a href="#page2" class="icon-up-open-big"></a>
+            </div>
+        </section>
+
+        <!-- start of Huixin -->
+        <!--        page2-->
+        <section class="vertical-scrolling" data-anchor="page2">
+
+            <!--            <p align="center">-->
+
+            <img src="./London.svg" width="20%">
+            <div>
+                <br><br>
+                <h4>Introduction</h4>
+                <br>
+                <h3>On this website, you could explore the transition of travel mode in London in four parts.</h3>
+                <br>
+                <h3>In each part, there are related policies which help you to understand the interactive maps and charts.</h3><br>
+            </div>
+        </section>
+
+        <!--        page3-->
+        <section class="vertical-scrolling" data-anchor="page3">
+
+            <!--            <p align="center">-->
+
+            <img src="./Road.svg" width="15%">
+            <div>
+                <br><br>
+                <h4>Overview</h4>
+                <br>
+                <h3>In this part, you will have an overview of the transportation methods in London through the decade (2010-2021).</h3>
+                <br>
+                <h3>Firstly, We will show you the road travel density in London from 2010-2019.</h3>
+            </div>
+            
+             <div class="scroll-icon">
+                <p>Start Exploring!</p>
+                <a href="#page4" class="icon-up-open-big"></a>
+            </div>
+        </section>
+
+
+        <!--        page4-->
+        <section class="vertical-scrolling" data-anchor="page4">
+            <iframe src="./Travel Density 2010-2019.html" height="652px" width="100%" frameBorder="0"></iframe>
+        </section>
+
+
+
+        <!--        page5-->
+        <section class="vertical-scrolling" data-anchor="page5">
+            <div style='width:23%; float: right;margin-right: 7%;margin-top: 5%'>
+                <h7>Trips by Purpose and Main Mode</h7><br><br><br>
+                <h5>Here is a chart shows the trips by purpose and main mode in England in 2019.</h5><br>
+                <h5>The car/van is main mode for all travel purposes. People prefer to walk for education or personal business reasons.</h5><br>
+                <h5>For business purpose, people always choose car and rail for convenience.</h5>
+            </div>
+            <div style='width:75%;height: 80%;margin-bottom: 0.00001%'>
+                <iframe src="./charts_2.html" height="700px" width="80%" frameBorder="0"></iframe>
+            </div>
+
+        </section>
+
+
+
+
+
+        <!--        page6-->
+        <section class="vertical-scrolling" data-anchor="page6">
+            <div>
+                <h4>London Public Transport Journeys by Type</h4><br>
+                <h3>How people go out?</h3><br>
+                <h3>Are there any changes during the pandemic period (COVID-19)?</h3><br>
+                <h3>Does the policy take a role on the changes?</h3>
+            </div>
+        </section>
+
+        <!--        page7-->
+        <section class="vertical-scrolling" data-anchor="page7">
+            <div class="horizontal-scrolling">
+<div style='width:50%;height: 75%;float: right;'><iframe src="charts_3.html" height="670px" width="100%" frameBorder="0"></iframe></div>
+
+                <div style='width:50%; float: left;margin-top: 10%;'>
+                    <h3>The pie charts show the percentage of London public transport by type.</h3><br>
+                    <h3>The first pie chart uses data from 2010 to 2021. The second one shows the data under the pandemic (COVID-19). </h3><br>
+                </div>
+            </div>
+
+
+            <div class="horizontal-scrolling">
+                <div style='margin-top: 0.1%;margin-left:0.2%'><iframe src="charts_4.html" height="525px" width="100%" frameBorder="0"></iframe>
+                </div>
+
+                <div style='bottom:12%;width:100%'>
+                    <h5>The data from 2020 (under pandemic) are much lesser than common data before, so two y-axes are much easier to understand in this line chart. The trend from March 2020 changes right fit the lockdown policy timeline. </h5>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- end of Huixin -->
+
+
+
+        <!--start of zzq-->
+        <!--page8-->
+
+        <section class="vertical-scrolling" data-anchor="page8">
+            <img src="./Emission.svg" width="20%">
+            <div>
+                <h4>Energy Consumption</h4>
+
+                <h5>The amount of CO2 road vehicles emit directly related to the amount of fuel they consume. A line chart is used in order to identify the total fuel consumption trends by different transports from 2005 to 2018. A map shows the distribution of road CO2 emission in Greater London based on the data from 2008 to 2020 and its forecast until 2030.</h5>
+            </div>
+             <div class="scroll-icon">
+                <p>Start Exploring!</p>
+                <a href="#page9" class="icon-up-open-big"></a>
+            </div>
+        </section>
+
+        <!--page9-->
+        <section class="vertical-scrolling" data-anchor="page9">
+            <section style="margin-left:2.6%;margin-bottom: 9.3%">
+
+                <head>
+                    <title>Total fuel consumption</title>
+
+                    <script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+                    <script type="text/javascript">
+                        function initViz() {
+                            var containerDiv = document.getElementById("vizContainer"),
+                                url = "https://public.tableau.com/views/Totalfuelconsumptionautomatic/Howmuchwespendondifferenttransport?:language=en-GB&:display_count=n&:origin=viz_share_link",
+                                options = {
+                                    hideTabs: true,
+                                    onFirstInteractive: function() {
+                                        console.log("Run this code when the viz has finished loading.");
+                                    }
+                                };
+
+                            var viz = new tableau.Viz(containerDiv, url, options);
+                            // Create a viz object and embed it in the container div.
+                        }
+
+                    </script>
+                </head>
+
+                <body onload="initViz();">
+                    <div id="vizContainer" style="width:800px; height:510px;"></div>
+                </body>
+            </section>
+        </section>
+
+
+
+        <!--page10-->
+        <section class="vertical-scrolling" data-anchor="page10">
+
+            <h4>Two government policies to address the road CO2 emission problem</h4>
+            <h3>One is expanding the areas for the Low Emission Bus Zone in London. Another one is making the Ultra Low Emission Zone effective on most vehicles across London.Both policies could significant reduce the CO2 emission every year.</h3>
+
+        </section>
+
+
+        <!--page11-->
+        <section class="vertical-scrolling" data-anchor="page11">
+
+            <div class="horizontal-scrolling">
+                <iframe src="CO2.html" height="640px" width="100%" frameborder="0"></iframe>
+            </div>
+
+        </section>
+
+
+
+        <!--End of zzq-->
+
+
+
+
+
+        <!--        mhj-->
+
+        <section class="vertical-scrolling" data-anchor="page12">
+            <img src="./Private.svg" width="15%">
+            <h4>Private transportation</h4>
+
+            <h5> The primary goal for London is to achieve carbon netral by 2050.</h5>
+
+            <h5>According to the mayor's transport strategy, the first step is to reach 80% of all trips in London to be made on foot, by bycycle or using public transport. </h5>
+            <h5> The two maps below shows the Licensed vehicles and public charge points in London.</h5>
+            <div class="scroll-icon">
+                <p>Start Exploring!</p>
+                <a href="#page13" class="icon-up-open-big"></a>
+            </div>
+        </section>
+
+
+
+        <section class="vertical-scrolling" data-anchor="page13">
+            <iframe src="cardensity.html" height="635px" width="100%" frameBorder="0"></iframe>
+        </section>
+
+        <section class="vertical-scrolling" data-anchor="page14">
+            <iframe src="EV%20test.html" height="630px" width="100%" frameBorder="0"></iframe>
+        </section>
+        <!--     end of   mhj-->
+
+
+        <!--start of Yale-->
+        <section class="vertical-scrolling" data-anchor="page15">
+            <img src="./Public.svg" width="18%">
+            <h4>Public Transportation</h4>
+            <h3>In the public transport section, we will firstly look at public transport accessibility index and then mainly focus on cycling. </h3>
+
+            <h6>This is because rail transport does not produce significant changes (e.g. a new line is opened) for a period of less than 5 or 10 years. It therefore has less impact on people's choice of travel mode than the shared cycles, which are expanding rapidly. Also, Infrastructure development will also drive people to choose greener modes of travel which leads to the visualisation below.</h6>
+            <div class="scroll-icon">
+                <p>Start Exploring!</p>
+                <a href="#page16" class="icon-up-open-big"></a>
+            </div>
+        </section>
+
+        <!-- Public Transportation page16-->
+        <section class="vertical-scrolling" data-anchor="page16">
+            <!--Map1-->
+            <div class="horizontal-scrolling">
+                <iframe src="PTAI-comparison2.html" height="600px" width="100%" frameBorder="0"></iframe>
+            </div>
+            <!--Map2-->
+            <div class="horizontal-scrolling">
+                <iframe src="PTAI-difference2.html" height="600px" width="100%" frameBorder="0"></iframe>
+            </div>
+        </section>
+
+        <!-- Public Transportation page17-->
+        <section class="vertical-scrolling" data-anchor="page17">
+            <!--Map3-->
+            <div class="horizontal-scrolling">
+                <iframe src="cycle_lanes.html" height="640x" width="100%" frameBorder="0"></iframe>
+            </div>
+            <!--Map4-->
+            <div class="horizontal-scrolling">
+                <iframe src="Docking_station.html" height="640px" width="100%" frameBorder="0"></iframe>
+            </div>
+        </section>
+
+        <!-- Public Transportation page18-->
+        <section class="vertical-scrolling" data-anchor="page18">
+            <div>
+                <iframe src="flowmap.html" height="635px" width="100%" frameBorder="0" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- Public Transportation page19-->
+        <section class="vertical-scrolling" data-anchor="page19">
+            <h4>Policy Inspiration</h4>
+            <img src="LTNs.png" width="40%">
+            <p>Maps for new LTNs introduced in London, March-September 2020</p>
+            <h6>Low traffic neighbourhoods (LNTs) has been introduced in London since the 1970s, and more are emerged to citizens in early 2020 with widely welcome. The aim of LNTs is to: reduce traffic and road danger, encourage people to walk or cycle rather than travel by car, and improve the living quality of communities etc.</h6>
+            <h6>The maps are made by <a href='http://rachelaldred.org/'>Rachel Aldred</a> who also builds a <a href='https://www.google.com/maps/d/viewer?mid=1m__ZQHAQOWGRu7-IZDP-gbV8Mr6ZfMOj&ll=51.48976696101502%2C-0.08817950000000074&z=10'>google map</a> for this project.</h6>
+        </section>
+        <!-- end of Yale-->
+
+        <!--        about us-->
+
+
+        <section class="vertical-scrolling" data-anchor="page20">
+            <br><br><br><br><br><br>
+            <img src="./casa.svg" width="10%">
+
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <img src="./Github.png" width="5%">
+            <br><br><br>
+             <p>The design of this website is inspired by <a href='https://webdesign.tutsplus.com/articles/vertical-and-horizontal-scrolling-with-fullpagejs--cms-24215'>George Martsoukos</a></p>
+            <p><b>Creators:</b>Hongjie Mu, Huixin Liu, Yale Gu, Zheqian Zhang</p>
+            <p>Group 12, <b><a href="https://twitter.com/casaucl?lang=en">@CASA UCL</a></b></p>
+            <p><b>Contact Us:</b><a href='https://github.com/HipHopZeus/HipHopZeus.github.io.git'>HipHopZeus</a></p>
+           
+            
+        </section>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://alvarotrigo.com/fullPage/jquery.fullpage.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.6.6/jquery.fullPage.min.js'></script>
+
+    <script type="text/javascript" src="vendors/scrolloverflow.min.js"></script>
+    <script type="text/javascript" src="fullpage.js"></script>
+    <script id="rendered-js">
+        // variables
+        var $header_top = $('.header-top');
+        var $nav = $('nav');
+
+
+
+        // toggle menu 
+        $header_top.find('a').on('click', function() {
+            $(this).parent().toggleClass('open-menu');
+        });
+
+
+
+        // fullpage customization
+        $('#fullpage').fullpage({
+            sectionsColor: ['#B8AE9C', '#F2AE72', '#f8ede8', '#f8ede8', '#f8ede8', '#f8ede8', '#f8ede8', '#d5dbb3', '#d5dbb3', '#d5dbb3', '#d5dbb3', '#8ab6d6', '#8ab6d6', '#8ab6d6', '#F2cc8f', '#F2cc8f', '#F2cc8f', '#F2cc8f', '#F2cc8f', '#B8AE9C'],
+            sectionSelector: '.vertical-scrolling',
+            slideSelector: '.horizontal-scrolling',
+            navigation: true,
+            slidesNavigation: true,
+            controlArrows: false,
+            scrollOverflow: true,
+            anchors: ['page1', 'page2', 'page3', 'page4', 'page5', 'page6', 'page7', 'page8', 'page9', 'page10', 'page11', 'page12', 'page13', 'page14', 'page15', 'page16', 'page17', 'page18', 'page19', 'page20'],
+            menu: '#menu',
+
+            //            afterLoad: function(anchorLink, index) {
+            //                $header_top.css('background', 'rgba(0, 47, 77, .3)');
+            //                $nav.css('background', 'rgba(0, 47, 77, .25)');
+            //                if (index == 6) {
+            //                    $('#fp-nav').hide();
+            //                }
+            //            },
+            //
+            //            onLeave: function(index, nextIndex, direction) {
+            //                if (index == 6) {
+            //                    $('#fp-nav').show();
+            //                }
+            //            },
+
+            //            afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex) {
+            //                if (anchorLink == 'page4' || anchorLink == 'page7' || anchorLink == 'page16' || anchorLink == 'page17') {
+            //                    $.fn.fullpage.setAllowScrolling(false, 'up');
+            //                    $header_top.css('background', 'transparent');
+            //                    $nav.css('background', 'transparent');
+            //                    $(this).css('background', '#374140');
+            //                    $(this).find('h2').css('color', 'white');
+            //                    $(this).find('h3').css('color', 'white');
+            //                    $(this).find('p').css({
+            //                        'color': '#DC3522',
+            //                        'opacity': 1,
+            //                        'transform': 'translateY(0)'
+            //                    });
+            //                }
+            //            },
+            //
+            //            onSlideLeave: function(anchorLink, index, slideIndex, direction) {
+            //                if (anchorLink == 'page4' || anchorLink == 'page7' || anchorLink == 'page16' || anchorLink == 'page17') {
+            //                    $.fn.fullpage.setAllowScrolling(true, 'up');
+            //                    $header_top.css('background', 'rgba(0, 47, 77, .3)');
+            //                    $nav.css('background', 'rgba(0, 47, 77, .25)');
+            //                }
+            //            }
+        });
+
+    </script>
+
+
+
+</body>
+
+</html>
+
+
+

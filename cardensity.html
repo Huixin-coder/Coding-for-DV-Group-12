@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset='utf-8' />
+        <title>London Cars Density in 2014 and 2019</title>
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+
+        <style>
+          body { margin: 0; padding: 0; }
+          #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+              
+          h1 {
+            font-size: 20px;
+            line-height: 30px;
+          }
+          
+          h2 {
+            font-size: 14px;
+            line-height: 20px;
+            margin-bottom: 10px;
+          }
+          
+          a {
+            text-decoration: none;
+            color: #2dc4b2;
+          }
+          
+          #console {
+            position: absolute;
+            width: 240px;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: white;
+              opacity: 0.7;
+          }
+              
+          .session {
+            margin-bottom: 20px;
+          }
+          
+          .row {
+            height: 12px;
+            width: 100%;
+          }
+          
+          .colors {
+            background: linear-gradient(to right, #feb24c, #fd8d3c, #fc4e2a, #e31a1c, #bd0026);
+            margin-bottom: 10px;
+          }
+          
+          .label {
+            width: 9%;
+            display: inline-block;
+            text-align: center;
+              font-size: 11px;
+          }
+          </style>
+          </head>
+              
+          <body>
+              
+          <style>
+                  body {
+                  overflow: hidden;
+                  }
+          
+                  body * {
+                  -webkit-touch-callout: none;
+                  -webkit-user-select: none;
+                  -moz-user-select: none;
+                  -ms-user-select: none;
+                  user-select: none;
+                  }
+          
+                  .map {
+                  position: absolute;
+                  top: 0;
+                  bottom: 0;
+                  width: 100%;
+                  }
+              
+                  .map-overlay {
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    background: rgba(255, 255, 255, 0.8);
+                    margin-right: 20px;
+                    font-family: Arial, sans-serif;
+                    overflow: auto;
+                    border-radius: 3px;
+                  }
+          
+                  #features {
+                    top: 0;
+                    height: 100px;
+                    margin-top: 5px;
+                    width: 300px;
+                  }
+          </style>
+   
+   
+   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+        
+    
+    
+
+        
+        <div id="comparison-container">
+        <div id="before" class="map"></div>
+        <div id="after" class="map"></div>
+        </div>
+        
+        <div id='console'>
+        <h1>London Licensed Vehicles between 2014 and 2019</h1>
+        <p>Data: <a href='https://data.london.gov.uk/dataset/licensed-vehicles-type-0'>Licensed Vehicles - Type, Borough</a> in London,UK, Dec 2019</p>
+        
+        <div class='session'>
+          <h2>Licensed Cars(in thousands)</h2>
+          <div class='row colors'>
+          </div>
+          <div class='row labels'>
+            <div class='label'><b>3</b></div>
+            <div class='label'><b>18</b></div>
+            <div class='label'><b>39</b></div>
+            <div class='label'><b>60</b></div>
+            <div class='label'><b>74</b></div>
+            <div class='label'><b>110</b></div>
+            <div class='label'><b>146+</b></div>
+   
+          </div>
+         
+        </div>
+            
+        </div>
+
+          
+        <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamFtaWVtdSIsImEiOiJja29yYnI3Z3MxM2Z0MnJwY21zandtMGk2In0.jL2209wo8fitHPGgYUracA';
+        
+
+        
+        var beforeMap = new mapboxgl.Map({
+        id: 'beforeMap',
+        container: 'before',
+        style: 'mapbox://styles/jamiemu/ckot9lkpcc94217p9c6i0pfa7',
+        center: [-0.1, 51.5],
+        zoom: 9.5
+        });
+        
+        var afterMap = new mapboxgl.Map({
+        container: 'after',
+        style: 'mapbox://styles/jamiemu/ckou2rgoq1f0617lkeyx00hw3',
+        center: [-0.1, 51.5],
+        zoom: 9.5
+        });
+                
+        // // A selector or reference to HTML element
+          var container = '#comparison-container';
+        
+          var map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+        // // Set this to enable comparing two maps by mouse movement:
+          //mousemove: true
+        });
+            
+        beforeMap.on('load', function() {
+
+
+                beforeMap.on('mousemove', 'ptai-8wsw6u',function(e) {
+                  var states = beforeMap.queryRenderedFeatures(e.point, {layers: ['ptai-8wsw6u']});
+
+                  if (states.length > 0) {
+                    document.getElementById('pd').innerHTML =  'PTAI of 2011 of ' + states[0].properties['LSOA11CD'] + '<strong><em>' + states[0].properties['2011Av PTA'] + '</strong></em></p>';
+                  } 
+                    else {
+                    document.getElementById('pd').innerHTML = '<p>Hover over a country!</p>';
+                  }
+                });
+
+            beforeMap.getCanvas().style.cursor = 'default'
+    });
+    
+    afterMap.on('load', function() {
+
+
+            afterMap.on('mousemove', 'ptai-8wsw6u',function(e) {
+              var states2 = afterMap.queryRenderedFeatures(e.point, {layers: ['ptai-8wsw6u']});
+                
+              if (states2.length > 0) {
+                document.getElementById('pd').innerHTML =  'PTAI of 2015: ' + '<strong><em>' + states2[0].properties['2015Av PTA'] + '</strong></em></p>';
+              } 
+                else {
+                document.getElementById('pd').innerHTML = '<p>Hover over a country!</p>';
+              }
+            });
+            
+        afterMap.getCanvas().style.cursor = 'default'
+});
+ 
+
+             
+        </script>
+        
+  </body>
+    
+</html>

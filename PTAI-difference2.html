@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>Difference of Public Transport Accessibility Index</title>
+<meta name='viewport' content='width=device-width, initial-scale=1' />
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+    </head>
+
+    <body>
+        <style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+h1 {
+  font-size: 20px;
+  line-height: 30px;
+}
+
+h2 {
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 10px;
+}
+
+a {
+  text-decoration: none;
+  color: #2dc4b2;
+}
+
+#console {
+  position: absolute;
+  width: 240px;
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: white;
+    opacity: 0.7;
+}
+            
+.session {
+  margin-bottom: 20px;
+}
+
+.row {
+  height: 12px;
+  width: 100%;
+}
+
+.colors {
+  background: linear-gradient(to right, #005f73, #099295, #94b2db, #e9d8a5, #f09c00, #ca6602, #ba3d03, #af1f12, #9b2226);
+  margin-bottom: 5px;
+}
+
+.label {
+  width: 9%;
+  display: inline-block;
+  text-align: center;
+    font-size: 11px;
+}
+
+        </style>
+        
+        
+    <div id='map'></div>
+    <div id='console'>
+  <h1>Difference of Public Transport Accessibility Index</h1>
+  <p>Data: Public Transport Accessibility Index of in
+      <a href='https://www.whatdotheyknow.com/request/ptal_data_for_all_lsoas_in_londo'>2011</a> and <a href='https://data.london.gov.uk/dataset/public-transport-accessibility-levels'> 2015</a> in London(from Transport for London)</p>
+    
+    <div class='session'>
+  <h2>Difference</h2>
+  <div class='row colors'>
+  </div>
+  <div class='row labels'>
+    <div class='label'><b>-6.5</b></div>
+    <div class='label'><b>-1</b></div>
+    <div class='label'><b>0</b></div>
+    <div class='label'><b>0.5</b></div>
+    <div class='label'><b>5</b></div>
+    <div class='label'><b>15</b></div>
+    <div class='label'><b>25</b></div>
+    <div class='label'><b>35</b></div>
+    <div class='label'><b>45+</b></div>
+  </div>
+        
+    <p></p>
+</div>
+    
+</div>
+        
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiYW5uZWd1dSIsImEiOiJja2hxOXl1Y2owNzJhMnJwYmk2YmMxYnZoIn0.Q8eejSLO2kx3Vrc6oyAmVA';
+
+var map = new mapboxgl.Map({
+  container: 'map', // container element id
+  style: 'mapbox://styles/anneguu/ckogbaff55stx17pb7hortr07',
+  center: [-0.1, 51.5], // initial map center in [lon, lat]
+  zoom: 9.5
+}); 
+    
+map.on('load', function () {
+        map.on('click', 'ptai-8wsw6u', function (e) {
+        new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(e.features[0].properties['LSOA11CD'] + ': ' + e.features[0].properties['Difference'])
+        .addTo(map);
+    });
+    
+    // Change the cursor to a pointer when the mouse is over the states layer.
+map.on('mouseenter', 'ptai-8wsw6u', function () {
+map.getCanvas().style.cursor = 'pointer';
+});
+ 
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', 'ptai-8wsw6u', function () {
+map.getCanvas().style.cursor = '';
+});
+});
+</script>
+        
+        
+    </body>
+</html>
